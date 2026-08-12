@@ -1,0 +1,9 @@
+<div class="border rounded-xl p-4 text-center <%= status.won?(key) ? 'bg-green-50 border-green-300' : 'bg-gray-50' %>">
+  <div class="text-4xl"><%= status.won?(key) ? "✅" : "❌" %></div>
+  <div class="font-bold mt-1"><%= label %></div>
+  <ul class="mt-2 text-xs text-gray-600 space-y-0.5">
+    <% status.wins(key).each do |win| %>
+      <li><%= win %></li>
+    <% end %>
+  </ul>
+</div>

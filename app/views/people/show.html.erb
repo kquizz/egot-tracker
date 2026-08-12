@@ -1,0 +1,43 @@
+<div class="max-w-2xl mx-auto p-6">
+  <%= link_to "← New search", root_path, class: "text-blue-600" %>
+
+  <div class="flex items-center gap-4 mt-2 mb-6">
+    <% if @profile.thumbnail_url %>
+      <%= image_tag @profile.thumbnail_url, class: "w-16 h-16 rounded-full object-cover" %>
+    <% end %>
+    <div>
+      <h1 class="text-3xl font-bold"><%= @profile.title %></h1>
+      <p class="text-lg font-medium">
+        <% if @status.egot? %>
+          🏆 EGOT!
+        <% else %>
+          <%= @status.score %>/4 — missing: <%= @status.missing_labels.to_sentence %>
+        <% end %>
+      </p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <% AwardClassifier::FAMILIES.each do |key, label, _phrase| %>
+      <%= render "award_tile", key: key, label: label, status: @status %>
+    <% end %>
+  </div>
+
+  <% if @nominations.present? %>
+    <div class="mt-8">
+      <h2 class="font-semibold">Nominations
+        <span class="text-gray-400 text-sm font-normal">(best-effort — may be incomplete)</span>
+      </h2>
+      <% @nominations.each do |family, labels| %>
+        <div class="mt-2">
+          <div class="text-sm text-gray-500"><%= EgotStatus::LABELS[family] %></div>
+          <ul class="list-disc list-inside">
+            <% labels.each do |label| %><li><%= label %></li><% end %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <p class="mt-8 text-xs text-gray-400">Based on Wikipedia.</p>
+</div>
