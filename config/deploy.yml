@@ -3,11 +3,12 @@ image: kquizz/egot-tracker
 
 servers:
   web:
-    - 192.168.50.220
+    hosts:
+      - 192.168.50.220
 
 proxy:
+  ssl: false   # Cloudflare terminates HTTPS; the tunnel speaks plain HTTP to us
   host: egot.kquizz.com   # add this route in the Cloudflare tunnel dashboard
-  app_port: 3000
 
 registry:
   server: ghcr.io
@@ -32,4 +33,7 @@ volumes:
 asset_path: /rails/public/assets
 
 builder:
-  arch: arm64
+  arch: amd64
+
+ssh:
+  user: kquizz
