@@ -1,24 +1,22 @@
-# README
+# EGOT Tracker
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Search a person and see how close they are to an EGOT — Emmy, Grammy, Oscar, Tony.
 
-Things you may want to cover:
+## How it works
+- **Wins** come from Wikipedia category membership (reliable). Detection matches an
+  award phrase (e.g. `Academy Award`) plus a win token (`winn`), which catches both
+  the `… Award winners` and `… Award–winning …` category forms and skips nominees.
+- **Nominations** are a best-effort Wikidata `P1411` rollup (may be incomplete);
+  they degrade silently to empty and never block the wins.
+- No API keys required — Wikipedia and Wikidata are unauthenticated.
 
-* Ruby version
+## Setup
+1. `bundle install`
+2. `bin/dev`
+3. Open http://localhost:3000
 
-* System dependencies
+## Stack
+Rails 8, Hotwire, Tailwind, MediaWiki + Wikidata APIs, Solid Cache. Deployed with Kamal.
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## Tests
+`bundle exec rspec`
