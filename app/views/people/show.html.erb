@@ -1,43 +1,22 @@
 <div class="max-w-2xl mx-auto p-6">
   <%= link_to "← New search", root_path, class: "text-blue-600" %>
 
-  <div class="flex items-center gap-4 mt-2 mb-6">
-    <% if @profile.thumbnail_url %>
-      <%= image_tag @profile.thumbnail_url, class: "w-16 h-16 rounded-full object-cover" %>
-    <% end %>
-    <div>
-      <h1 class="text-3xl font-bold"><%= @profile.title %></h1>
-      <p class="text-lg font-medium">
-        <% if @status.egot? %>
-          🏆 EGOT!
-        <% else %>
-          <%= @status.score %>/4 — missing: <%= @status.missing_labels.to_sentence %>
-        <% end %>
-      </p>
-    </div>
-  </div>
+  <h1 class="text-3xl font-bold mt-2 mb-6"><%= @title %></h1>
 
-  <div class="grid grid-cols-2 gap-4">
-    <% AwardClassifier::FAMILIES.each do |key, label, _phrase| %>
-      <%= render "award_tile", key: key, label: label, status: @status %>
-    <% end %>
-  </div>
-
-  <% if @nominations.present? %>
-    <div class="mt-8">
-      <h2 class="font-semibold">Nominations
-        <span class="text-gray-400 text-sm font-normal">(best-effort — may be incomplete)</span>
-      </h2>
-      <% @nominations.each do |family, labels| %>
-        <div class="mt-2">
-          <div class="text-sm text-gray-500"><%= EgotStatus::LABELS[family] %></div>
-          <ul class="list-disc list-inside">
-            <% labels.each do |label| %><li><%= label %></li><% end %>
-          </ul>
+  <%= turbo_frame_tag "awards", src: person_awards_path(title: @title) do %>
+    <div class="grid grid-cols-2 gap-4">
+      <% AwardClassifier::FAMILIES.each do |_key, label, _phrase| %>
+        <div class="border rounded-xl p-4 text-center bg-gray-50">
+          <div class="flex justify-center">
+            <div class="w-9 h-9 rounded-full border-4 border-gray-200 border-t-gray-500 animate-spin"></div>
+          </div>
+          <div class="font-bold mt-2 text-gray-400"><%= label %></div>
         </div>
       <% end %>
     </div>
   <% end %>
+
+  <%= turbo_frame_tag "nominations", src: person_nominations_path(title: @title) %>
 
   <p class="mt-8 text-xs text-gray-400">Based on Wikipedia.</p>
 </div>

@@ -11,5 +11,7 @@ Rails.application.routes.draw do
 
   root "searches#show"
   get "search", to: "searches#show", as: :search
+  get "people/awards", to: "people#awards", as: :person_awards
+  get "people/nominations", to: "people#nominations", as: :person_nominations
   get "people/:title", to: "people#show", as: :person, constraints: { title: /.+/ }
 end

@@ -1,0 +1,17 @@
+<%= turbo_frame_tag "nominations" do %>
+  <% if @nominations.present? %>
+    <div class="mt-8">
+      <h2 class="font-semibold">Nominations
+        <span class="text-gray-400 text-sm font-normal">(best-effort — may be incomplete)</span>
+      </h2>
+      <% @nominations.each do |family, labels| %>
+        <div class="mt-2">
+          <div class="text-sm text-gray-500"><%= EgotStatus::LABELS[family] %></div>
+          <ul class="list-disc list-inside">
+            <% labels.each do |label| %><li><%= label %></li><% end %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
