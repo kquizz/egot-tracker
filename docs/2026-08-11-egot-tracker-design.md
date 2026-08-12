@@ -64,20 +64,29 @@ Thin controllers delegate to services; results render as Turbo Frames.
 
 - **`AwardClassifier`** — pure logic; no I/O. Given category titles, returns an
   `EgotStatus` with, per family (`emmy`, `grammy`, `oscar`, `tony`): `won?` and
-  the list of specific win labels. Detection is a substring match on the four
-  markers:
-  - Oscar → `"Academy Award winners"`
-  - Grammy → `"Grammy Award winners"`
-  - Emmy → `"Emmy Award winners"` (matches Primetime and Daytime)
-  - Tony → `"Tony Award winners"`
+  the list of specific win labels. A family is **won** iff any category contains
+  that family's **award phrase** *and* a **win token** (`winn`, which matches
+  winner / winners / winning):
+  - Oscar → phrase `"Academy Award"`
+  - Grammy → phrase `"Grammy Award"`
+  - Emmy → phrase `"Emmy Award"` (matches Primetime and Daytime)
+  - Tony → phrase `"Tony Award"`
 
-  These markers are safe against near-misses: BAFTA categories read
-  `"BAFTA Award winners"`, and `"Academy of Country Music Award winners"` does not
-  contain `"Academy Award winners"` as a substring.
+  The award-phrase + win-token rule is required because Wikipedia does **not** use
+  a single suffix. Wins appear as both `"… Award winners"` (e.g.
+  `"Grammy Award winners"`) and `"… Award–winning …"` (e.g.
+  `"Best Original Song Academy Award–winning songwriters"` — John Legend's Oscar,
+  which a `"Academy Award winners"` suffix match would miss). The `winn` token
+  also excludes `"… Award nominees"` categories.
 
-  Win label = the category title with the `"Category:"` prefix and the trailing
-  award-family suffix stripped (e.g. `"Best Supporting Actress Academy Award
-  winners"` → `"Best Supporting Actress"`).
+  The phrases are safe against near-misses: BAFTA reads `"BAFTA Award"`,
+  `"Academy of Country Music Award"` does not contain the contiguous phrase
+  `"Academy Award"`, and `"Academy Honorary Award"` (honorary-only) is likewise
+  excluded — acceptable for v1's competitive-leaning behavior.
+
+  Win label = the category title with the `"Category:"` prefix stripped, shown
+  as-is (e.g. `"Best Supporting Actress Academy Award winners"`). No fragile
+  suffix surgery — the raw category is already human-readable.
 
 - **`NominationsSource`** — best-effort Wikidata `P1411` rollup keyed by QID.
   Returns a per-family list of nomination labels, or `{}` on any error, empty
