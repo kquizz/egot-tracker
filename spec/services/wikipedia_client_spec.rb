@@ -29,4 +29,47 @@ RSpec.describe WikipediaClient do
       expect(a_request(:get, /wikipedia/)).not_to have_been_made
     end
   end
+
+  describe "#profile" do
+    it "returns categories, the Wikidata QID, and a thumbnail" do
+      body = {
+        query: {
+          pages: {
+            "12345" => {
+              title: "John Legend",
+              pageprops: { wikibase_item: "Q44857" },
+              thumbnail: { source: "https://img/jl.jpg" },
+              categories: [
+                { title: "Category:Grammy Award winners" },
+                { title: "Category:Tony Award winners" }
+              ]
+            }
+          }
+        }
+      }.to_json
+
+      stub_request(:get, "https://en.wikipedia.org/w/api.php")
+        .with(query: hash_including("titles" => "John Legend", "action" => "query"))
+        .to_return(status: 200, body: body, headers: { "Content-Type" => "application/json" })
+
+      profile = client.profile("John Legend")
+
+      expect(profile.title).to eq("John Legend")
+      expect(profile.qid).to eq("Q44857")
+      expect(profile.thumbnail_url).to eq("https://img/jl.jpg")
+      expect(profile.categories).to include("Category:Grammy Award winners")
+    end
+
+    it "handles a page with no pageprops or thumbnail" do
+      body = { query: { pages: { "1" => { title: "Nobody", categories: [] } } } }.to_json
+      stub_request(:get, "https://en.wikipedia.org/w/api.php")
+        .with(query: hash_including("titles" => "Nobody"))
+        .to_return(status: 200, body: body, headers: { "Content-Type" => "application/json" })
+
+      profile = client.profile("Nobody")
+      expect(profile.qid).to be_nil
+      expect(profile.thumbnail_url).to be_nil
+      expect(profile.categories).to eq([])
+    end
+  end
 end

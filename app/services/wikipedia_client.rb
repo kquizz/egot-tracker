@@ -6,6 +6,7 @@ class WikipediaClient
   USER_AGENT = "egot-tracker/0.1 (https://egot.kquizz.com)".freeze
 
   Candidate = Struct.new(:title, :description, :thumbnail_url, keyword_init: true)
+  Profile = Struct.new(:title, :qid, :thumbnail_url, :categories, keyword_init: true)
 
   def initialize(cache: Rails.cache)
     @cache = cache
@@ -23,6 +24,22 @@ class WikipediaClient
         thumbnail_url: page.dig("thumbnail", "url")
       )
     end
+  end
+
+  def profile(title)
+    payload = get_json(API,
+      action: "query", format: "json",
+      prop: "categories|pageprops|pageimages",
+      ppprop: "wikibase_item", piprop: "thumbnail", pithumbsize: 200,
+      cllimit: 500, clshow: "!hidden", titles: title)
+
+    page = payload.dig("query", "pages")&.values&.first || {}
+    Profile.new(
+      title: page["title"] || title,
+      qid: page.dig("pageprops", "wikibase_item"),
+      thumbnail_url: page.dig("thumbnail", "source"),
+      categories: Array(page["categories"]).map { |c| c["title"] }
+    )
   end
 
   private
