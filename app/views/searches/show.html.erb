@@ -1,0 +1,18 @@
+<div class="max-w-2xl mx-auto p-6">
+  <h1 class="text-3xl font-bold mb-1">EGOT Tracker</h1>
+  <p class="text-gray-500 mb-6">How close is anyone to an Emmy, Grammy, Oscar &amp; Tony?</p>
+
+  <%= form_with url: search_path, method: :get,
+        data: { controller: "search", turbo_frame: "candidates" } do |f| %>
+    <%= f.search_field :q, value: @query, autofocus: true,
+          placeholder: "Search a person…",
+          data: { action: "input->search#submit" },
+          class: "w-full border rounded-lg px-4 py-3 text-lg" %>
+  <% end %>
+
+  <%= turbo_frame_tag "candidates", class: "mt-4 flex flex-col gap-1" do %>
+    <% @candidates.each do |candidate| %>
+      <%= render "candidate", candidate: candidate %>
+    <% end %>
+  <% end %>
+</div>
